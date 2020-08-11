@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Ignore CSVs we don't need to ship hundreds of megs of data around.
+*.csv
