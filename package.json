@@ -1,0 +1,25 @@
+{
+  "name": "chromatixtest",
+  "version": "1.0.0",
+  "description": "Technical test by chromatix",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hamish-Bassett/chromatixtest.git"
+  },
+  "author": "Hamish Bassett",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hamish-Bassett/chromatixtest/issues"
+  },
+  "homepage": "https://github.com/Hamish-Bassett/chromatixtest#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "mocha": "^8.1.1",
+    "chai": "^4.2.0"
+  }
+}
