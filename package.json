@@ -17,9 +17,16 @@
   },
   "homepage": "https://github.com/Hamish-Bassett/chromatixtest#readme",
   "dependencies": {
+    "rewire": "^5.0.0"
   },
   "devDependencies": {
-    "mocha": "^8.1.1",
-    "chai": "^4.2.0"
+    "chai": "^4.2.0",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.0",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "mocha": "^8.1.1"
   }
 }
