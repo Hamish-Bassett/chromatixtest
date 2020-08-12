@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Hamish-Bassett/chromatixtest#readme",
   "dependencies": {
+    "big.js": "^5.2.2",
     "fast-csv": "^4.3.1",
     "mock-fs": "^4.12.0"
   },
