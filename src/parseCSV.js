@@ -14,7 +14,7 @@ class CSVParser extends EventEmitter {
         this.emit('error', err);
       })
       .on('data', (data) => this.emit('data', data))
-      .on('close', () => this.emit('close'));
+      .on('end', () => this.emit('end'));
   }
 }
 

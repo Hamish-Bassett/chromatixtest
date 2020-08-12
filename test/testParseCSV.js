@@ -6,7 +6,6 @@ const mock = require('mock-fs');
 const CSVParser = rewire('../src/parseCSV');
 
 const { expect } = chai;
-chai.should();
 
 const candidate = new CSVParser();
 
