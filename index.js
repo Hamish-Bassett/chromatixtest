@@ -1,20 +1,24 @@
 const getFileReader = require('./src/getFileStream');
 const ParseCSV = require('./src/parseCSV');
 const RegionAccumulator = require('./src/regionAccumulator');
+const OrderAccumulator = require('./src/orderAccumulator');
 const outputObject = require('./src/writeOutput');
 
 const filePath = 'target.csv';
 
 const fileStream = getFileReader(filePath);
 const csvParser = new ParseCSV();
-const accumulator = new RegionAccumulator();
+const regionAccumulator = new RegionAccumulator();
+const orderAccumulator = new OrderAccumulator();
 
 csvParser.on('data', (data) => {
-  accumulator.parseData(data);
+  regionAccumulator.parseData(data);
+  orderAccumulator.parseData(data);
 })
   .on('end', () => {
-    accumulator.convertNumbersToString();
-    outputObject(accumulator, 'task1.json');
+    regionAccumulator.convertNumbersToString();
+    outputObject(regionAccumulator, 'task1.json');
+    outputObject(orderAccumulator, 'task2.json');
   });
 
 csvParser.parseCSV(fileStream);
