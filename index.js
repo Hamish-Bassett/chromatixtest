@@ -1,6 +1,7 @@
 const getFileReader = require('./src/getFileStream');
 const ParseCSV = require('./src/parseCSV');
 const RegionAccumulator = require('./src/regionAccumulator');
+const outputObject = require('./src/writeOutput');
 
 const filePath = 'target.csv';
 
@@ -13,7 +14,7 @@ csvParser.on('data', (data) => {
 })
   .on('end', () => {
     accumulator.convertNumbersToString();
-    console.log('parsing complete');
+    outputObject(accumulator, 'task1.json');
   });
 
 csvParser.parseCSV(fileStream);
