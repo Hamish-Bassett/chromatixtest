@@ -1,12 +1,70 @@
 const Big = require('big.js'); // needed for precise calculations.
 
-const Total = require('./Total');
-// accumulator to track incoming data from the parsed CSV.
+class Total {
+  constructor() {
+    this.Revenue = 0;
+    this.Cost = 0;
+    this.Profit = 0;
+  }
+
+  updateValues(updateRevenue, updateCost, updateProfit) {
+    this.Profit = this.accumulateData(this.Profit, updateProfit);
+    this.Cost = this.accumulateData(this.Cost, updateCost);
+    this.Revenue = this.accumulateData(this.Revenue, updateRevenue);
+  }
+
+  /**
+   * While using inbuilt numbers is much faster, decimals are to be preferred in calculations of money
+   * because NodeJS does not have an inherent decimal type we have to use a library.
+   *
+   * If accuracy is not required we can move to inbuilt float type however in the financial domain
+   * this is not best practice.
+   */
+  accumulateData(rootValue, adder) {
+    return Big(rootValue).plus(adder);
+  }
+
+  convertToStrings() {
+    this.Revenue = this.Revenue.toFixed(2);
+    this.Cost = this.Cost.toFixed(2);
+    this.Profit = this.Profit.toFixed(2);
+  }
+}
+
+class RegionTotal {
+  constructor() {
+    this.Total = new Total();
+    this.Countries = {};
+  }
+
+  updateValues(updateRevenue, updateCost, updateProfit, country, itemType) {
+    this.Total.updateValues(updateRevenue, updateCost, updateProfit);
+    if (!this.Countries[country]) {
+      return;
+    }
+    this.Countries[country].updateValues(updateRevenue, updateCost, updateProfit, itemType);
+  }
+}
+
+class CountryTotal {
+  constructor() {
+    this.Total = new Total();
+    this.ItemTypes = {};
+  }
+
+  updateValues(updateRevenue, updateCost, updateProfit, itemType) {
+    this.Total.updateValues(updateRevenue, updateCost, updateProfit);
+    if (!this.ItemTypes[itemType]) {
+      return;
+    }
+    this.ItemTypes[itemType].updateValues(updateRevenue, updateCost, updateProfit);
+  }
+}
+
 class RegionAccumulator {
   constructor() {
     this.Regions = {};
     this.ItemTypes = {};
-    this.decimalPrecision = 2;
   }
 
   parseData(data) {
@@ -38,39 +96,8 @@ class RegionAccumulator {
     this.createMissingRegion(regionName);
     this.createMissingCountry(countryName, regionName);
     this.createMissingItemTypes(itemType, countryName, regionName);
-    this.accumulateCountryTotal(countryName, totalProfit, totalCost, totalRevenue, regionName);
-    this.accumulateCountryItemTypeTotal(countryName,
-      itemType,
-      totalProfit,
-      totalCost,
-      totalRevenue,
-      regionName);
-    this.accumulateRegionTotal(regionName, totalProfit, totalCost, totalRevenue);
-    this.accumulateItemTypeTotal(itemType, totalProfit, totalCost, totalRevenue);
-  }
-
-  accumulateItemTypeTotal(itemType, totalProfit, totalCost, totalRevenue) {
-    this.ItemTypes[itemType].Profit = this.accumulateData(this.ItemTypes[itemType].Profit, totalProfit);
-    this.ItemTypes[itemType].Cost = this.accumulateData(this.ItemTypes[itemType].Cost, totalCost);
-    this.ItemTypes[itemType].Revenue = this.accumulateData(this.ItemTypes[itemType].Revenue, totalRevenue);
-  }
-
-  accumulateRegionTotal(regionName, totalProfit, totalCost, totalRevenue) {
-    this.Regions[regionName].Total.Profit = this.accumulateData(this.Regions[regionName].Total.Profit, totalProfit);
-    this.Regions[regionName].Total.Cost = this.accumulateData(this.Regions[regionName].Total.Cost, totalCost);
-    this.Regions[regionName].Total.Revenue = this.accumulateData(this.Regions[regionName].Total.Revenue, totalRevenue);
-  }
-
-  accumulateCountryItemTypeTotal(countryName, itemType, totalProfit, totalCost, totalRevenue, regionName) {
-    this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Profit = this.accumulateData(this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Profit, totalProfit);
-    this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Cost = this.accumulateData(this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Cost, totalCost);
-    this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Revenue = this.accumulateData(this.Regions[regionName].Countries[countryName].ItemTypes[itemType].Revenue, totalRevenue);
-  }
-
-  accumulateCountryTotal(countryName, totalProfit, totalCost, totalRevenue, regionName) {
-    this.Regions[regionName].Countries[countryName].Total.Profit = this.accumulateData(this.Regions[regionName].Countries[countryName].Total.Profit, totalProfit);
-    this.Regions[regionName].Countries[countryName].Total.Cost = this.accumulateData(this.Regions[regionName].Countries[countryName].Total.Cost, totalCost);
-    this.Regions[regionName].Countries[countryName].Total.Revenue = this.accumulateData(this.Regions[regionName].Countries[countryName].Total.Revenue, totalRevenue);
+    this.Regions[regionName].updateValues(totalRevenue, totalCost, totalProfit, countryName, itemType);
+    this.ItemTypes[itemType].updateValues(totalRevenue, totalCost, totalProfit);
   }
 
   createMissingItemTypes(itemType, countryName, regionName) {
@@ -85,32 +112,18 @@ class RegionAccumulator {
 
   createMissingCountry(countryName, regionName) {
     if (!this.Regions[regionName].Countries[countryName]) {
-      this.Regions[regionName].Countries[countryName] = {
-        Total: new Total(),
-        ItemTypes: {},
-      };
+      this.Regions[regionName].Countries[countryName] = new CountryTotal();
     }
   }
 
   createMissingRegion(regionName) {
     if (!this.Regions[regionName]) {
-      this.Regions[regionName] = { Total: new Total(), Countries: {} };
+      this.Regions[regionName] = new RegionTotal();
     }
   }
 
-  /**
-   * While using inbuilt numbers is much faster, decimals are to be preferred in calculations of money
-   * because NodeJS does not have an inherent decimal type we have to use a library.
-   *
-   * If accuracy is not required we can move to inbuilt float type however in the financial domain
-   * this is not best practice.
-   */
-  accumulateData(rootValue, adder) {
-    return Big(rootValue).plus(adder);
-  }
-
   convertNumbersToString() {
-    const regionsKeys = Object.keys(this.Regions)
+    const regionsKeys = Object.keys(this.Regions);
     regionsKeys.forEach((regionsKey) => {
       if (this.Regions[regionsKey]) {
         this.Regions[regionsKey].Total.convertToStrings();
