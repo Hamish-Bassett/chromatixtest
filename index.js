@@ -18,7 +18,7 @@ csvParser.on('data', (data) => {
   .on('end', () => {
     regionAccumulator.convertNumbersToString();
     outputObject(regionAccumulator, 'task1.json');
-    outputObject(orderAccumulator, 'task2.json');
+    outputObject(orderAccumulator.years, 'task2.json');
   });
 
 csvParser.parseCSV(fileStream);
