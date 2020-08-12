@@ -1,6 +1,7 @@
 const chai = require('chai');
 const rewire = require('rewire');
 const fs = require('fs');
+const mock = require('mock-fs');
 
 const importFileHandler = rewire('../src/getFileStream');
 
@@ -19,12 +20,10 @@ describe('importFile', () => {
     expect(() => { importFileHandler("path doesn't exist"); }).to.throw();
   });
   it('the method should return a fileSystemReader', () => {
-    function mockFileHandler() { /* deliberately left blank */ }
-    importFileHandler.__with__({
-      validateFilePath: mockFileHandler,
-    })(() => {
-      const res = importFileHandler('file');
-      expect(res).to.be.an.instanceOf(fs.ReadStream);
+    mock({
+      file: mock.file({}),
     });
+    const res = importFileHandler('file');
+    expect(res).to.be.an.instanceOf(fs.ReadStream);
   });
 });
