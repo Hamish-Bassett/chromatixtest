@@ -91,19 +91,35 @@ class ShippingTimeAccumulator {
     }
     const year = dateComponents[2];
     const month = dateComponents[0];
-    if (!this.years[year]) {
-      this.years[year] = {};
-    }
-    if (!this.years[year][month]) {
-      this.years[year][month] = new ShippingMonth();
-    }
-    if (!this.years[year][month].Regions[region]) {
-      this.years[year][month].Regions[region] = new ShippingRegion();
-    }
+    this.createMissingYear(year);
+    this.createMissingMonth(year, month);
+    this.createMissingRegion(year, month, region);
+    this.createMissingCountry(year, month, region, country);
+    this.years[year][month].increaseCount(this.getDaysToShip(orderDate, shipDate), region, country);
+  }
+
+  createMissingCountry(year, month, region, country) {
     if (!this.years[year][month].Regions[region].Countries[country]) {
       this.years[year][month].Regions[region].Countries[country] = new ShippingCountry();
     }
-    this.years[year][month].increaseCount(this.getDaysToShip(orderDate, shipDate), region, country);
+  }
+
+  createMissingRegion(year, month, region) {
+    if (!this.years[year][month].Regions[region]) {
+      this.years[year][month].Regions[region] = new ShippingRegion();
+    }
+  }
+
+  createMissingMonth(year, month) {
+    if (!this.years[year][month]) {
+      this.years[year][month] = new ShippingMonth();
+    }
+  }
+
+  createMissingYear(year) {
+    if (!this.years[year]) {
+      this.years[year] = {};
+    }
   }
 }
 
