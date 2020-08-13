@@ -1,5 +1,5 @@
 const stream = require('stream');
-const csv = require('fast-csv');
+const csv = require('csv-parser');
 const EventEmitter = require('events');
 
 class CSVParser extends EventEmitter {
@@ -16,7 +16,7 @@ class CSVParser extends EventEmitter {
     // so we can easily extend behaviour.
     readStream
       .setEncoding('utf-8')
-      .pipe(csv.parse({ headers: true }))
+      .pipe(csv())
       .on('error', (err) => {
         this.emit('error', err);
       })
