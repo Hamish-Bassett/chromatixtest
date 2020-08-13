@@ -2,7 +2,7 @@
 
 ## Purpose
 
-this is a test required by the chromatix interview process
+This is takes an input CSV and analyses the data to produce 3 specific sets of data.
 
 ## Getting Started
 
